@@ -1,15 +1,19 @@
 package controller
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/deadman360/crud_portifolio/src/configuration/logger"
 	"github.com/deadman360/crud_portifolio/src/configuration/validation"
 	"github.com/deadman360/crud_portifolio/src/controller/routes/model/request"
-	"github.com/deadman360/crud_portifolio/src/controller/routes/model/response"
+	"github.com/deadman360/crud_portifolio/src/model"
+	"github.com/deadman360/crud_portifolio/src/model/service"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap/zapcore"
+)
+
+var (
+	UserDomainInterface model.UserDomainInterface
 )
 
 func CreateUser(c *gin.Context) {
@@ -29,17 +33,24 @@ func CreateUser(c *gin.Context) {
 		c.JSON(restErr.Code, restErr)
 		return
 	}
-	fmt.Println(UserRequest)
-	response := response.UserResponse{
-		ID:    "test",
-		Email: UserRequest.Email,
-		Name:  UserRequest.Name,
-		Age:   UserRequest.Age,
+
+	domain := model.NewUserDomain(
+		UserRequest.Email,
+		UserRequest.Password,
+		UserRequest.Name,
+		UserRequest.Age)
+
+	service := service.NewUserDomainService()
+
+	if err := service.CreateUser(domain); err != nil {
+		c.JSON(err.Code, err)
+		return
 	}
+
 	logger.Info("User created sucessfully",
 		zapcore.Field{
 			Key:    "journey",
 			String: "CreateUser",
 		})
-	c.JSON(http.StatusOK, response)
+	c.JSON(http.StatusOK, "")
 }
