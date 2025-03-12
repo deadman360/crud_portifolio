@@ -9,7 +9,7 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-func (ud *userDomainService) CreateUser(
+func (*userDomainService) CreateUser(
 	userDomain model.UserDomainInterface,
 ) *rest_err.RestErr {
 	logger.Info("Init createUser model", zapcore.Field{

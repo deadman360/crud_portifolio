@@ -7,7 +7,7 @@ import (
 	"github.com/deadman360/crud_portifolio/src/configuration/validation"
 	"github.com/deadman360/crud_portifolio/src/controller/routes/model/request"
 	"github.com/deadman360/crud_portifolio/src/model"
-	"github.com/deadman360/crud_portifolio/src/model/service"
+	"github.com/deadman360/crud_portifolio/src/view"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap/zapcore"
 )
@@ -16,7 +16,7 @@ var (
 	UserDomainInterface model.UserDomainInterface
 )
 
-func CreateUser(c *gin.Context) {
+func (uc *userControllerInterface) CreateUser(c *gin.Context) {
 	logger.Info("Init CreateUser controller",
 		zapcore.Field{
 			Key:    "journey",
@@ -40,9 +40,7 @@ func CreateUser(c *gin.Context) {
 		UserRequest.Name,
 		UserRequest.Age)
 
-	service := service.NewUserDomainService()
-
-	if err := service.CreateUser(domain); err != nil {
+	if err := uc.service.CreateUser(domain); err != nil {
 		c.JSON(err.Code, err)
 		return
 	}
@@ -52,5 +50,6 @@ func CreateUser(c *gin.Context) {
 			Key:    "journey",
 			String: "CreateUser",
 		})
-	c.JSON(http.StatusOK, "")
+		
+	c.JSON(http.StatusOK, view.ConvertDomainToResponse(domain))
 }

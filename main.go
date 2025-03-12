@@ -4,7 +4,9 @@ import (
 	"log"
 
 	"github.com/deadman360/crud_portifolio/src/configuration/logger"
+	"github.com/deadman360/crud_portifolio/src/controller"
 	"github.com/deadman360/crud_portifolio/src/controller/routes"
+	"github.com/deadman360/crud_portifolio/src/model/service"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
@@ -15,10 +17,15 @@ func main() {
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
+
+	//Iniciando as Deps
+	service := service.NewUserDomainService()
+	userController := controller.NewUserControllerInterface(service)
+
 	router := gin.Default()
 	userGroup := router.Group("/user")
 
-	routes.InitRoutes(userGroup)
+	routes.InitRoutes(userGroup, userController)
 
 	if err := router.Run(":8080"); err != nil {
 		log.Fatal(err)
