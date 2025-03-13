@@ -10,7 +10,6 @@ import (
 	"github.com/deadman360/crud_portifolio/src/view"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
 )
 
 var (
@@ -22,11 +21,7 @@ func (uc *userControllerInterface) CreateUser(c *gin.Context) {
 
 	var UserRequest request.UserRequest
 	if err := c.ShouldBindBodyWithJSON(&UserRequest); err != nil {
-		logger.Error("Error trying to validate user info", err,
-			zapcore.Field{
-				Key:    "journey",
-				String: "CreateUser",
-			})
+		logger.Error("Error trying to validate user info", err, zap.String("journey", "createUser"))
 		restErr := validation.ValidateUserError(err)
 		c.JSON(restErr.Code, restErr)
 		return
@@ -43,11 +38,7 @@ func (uc *userControllerInterface) CreateUser(c *gin.Context) {
 		return
 	}
 
-	logger.Info("User created sucessfully",
-		zapcore.Field{
-			Key:    "journey",
-			String: "CreateUser",
-		})
+	logger.Info("User created sucessfully", zap.String("journey", "CreateUser"))
 
 	c.JSON(http.StatusOK, view.ConvertDomainToResponse(domain))
 }
