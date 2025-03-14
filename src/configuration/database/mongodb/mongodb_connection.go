@@ -20,8 +20,13 @@ func NewMongoDbConnection(ctx context.Context) (*mongo.Database, error) {
 	journey := zap.String("journey", "MongoDB")
 	mongodb_uri := os.Getenv(MONGODB_URL)
 	mongodb_database := os.Getenv(MONGO_USER_DB)
+	bsonOpts := &options.BSONOptions{
+		UseJSONStructTags: true,
+		NilSliceAsEmpty:   true,
+	}
+
 	logger.Info("Init MongoDB", journey)
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(mongodb_uri))
+	client, err := mongo.Connect(ctx, options.Client().SetBSONOptions(bsonOpts).ApplyURI(mongodb_uri))
 	if err != nil {
 		logger.Error("Error trying to connect to MongoDB", err, journey)
 		return nil, err

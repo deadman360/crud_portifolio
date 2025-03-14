@@ -7,11 +7,12 @@ import (
 	"github.com/deadman360/crud_portifolio/src/configuration/logger"
 	"github.com/deadman360/crud_portifolio/src/configuration/rest_err"
 	"github.com/deadman360/crud_portifolio/src/model"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.uber.org/zap"
 )
 
 const (
-	MONGO_USER_DB_COLLECTION = "MONGO_DB_USER_COLLECTION"
+	MONGO_USER_DB_COLLECTION = "MONGO_USER_DB_COLLECTION"
 )
 
 func (ur *userRepository) CreateUser(
@@ -23,7 +24,7 @@ func (ur *userRepository) CreateUser(
 	collection_name := os.Getenv(MONGO_USER_DB_COLLECTION)
 	collection := ur.databaseConnection.Collection(collection_name)
 
-	value, err := userDomain.GetJSONValue()
+	value, err := userDomain.GetBSONValue()
 	if err != nil {
 		return nil, rest_err.NewInternalServerError(err.Error(), nil)
 	}
@@ -31,7 +32,8 @@ func (ur *userRepository) CreateUser(
 	if err != nil {
 		return nil, rest_err.NewInternalServerError(err.Error(), nil)
 	}
-	userDomain.SetID(result.InsertedID.(string))
-	logger.Info("User inserted in database id:"+result.InsertedID.(string), journey)
+	id := result.InsertedID.(primitive.ObjectID).Hex()
+	userDomain.SetID(id)
+	logger.Info("User inserted in database id:"+id, journey)
 	return userDomain, nil
 }
