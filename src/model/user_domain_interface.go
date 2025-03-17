@@ -5,14 +5,13 @@ type UserDomainInterface interface {
 	GetPassword() string
 	GetName() string
 	GetAge() int8
+	GetId() string
 
 	SetID(string)
-
-	GetBSONValue() (interface{}, error)
 
 	EncryptPassword()
 }
 
 func (ud *userDomain) SetID(id string) {
-	ud.Id = id
+	ud.id = id
 }

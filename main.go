@@ -1,12 +1,12 @@
 package main
 
 import (
+	"context"
 	"log"
 
+	"github.com/deadman360/crud_portifolio/src/configuration/database/mongodb"
 	"github.com/deadman360/crud_portifolio/src/configuration/logger"
-	"github.com/deadman360/crud_portifolio/src/controller"
 	"github.com/deadman360/crud_portifolio/src/controller/routes"
-	"github.com/deadman360/crud_portifolio/src/model/service"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
@@ -18,11 +18,15 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	//Iniciando as Deps
-	service := service.NewUserDomainService()
-	userController := controller.NewUserControllerInterface(service)
+	database, err := mongodb.NewMongoDbConnection(context.Background())
+	if err != nil {
+		log.Fatal("Error trying to Connect with database")
+	}
+
+	userController := InitDependecies(database)
 
 	router := gin.Default()
+
 	userGroup := router.Group("/user")
 
 	routes.InitRoutes(userGroup, userController)
@@ -30,5 +34,4 @@ func main() {
 	if err := router.Run(":8080"); err != nil {
 		log.Fatal(err)
 	}
-
 }
