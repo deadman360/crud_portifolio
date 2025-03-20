@@ -8,7 +8,9 @@ import (
 	"github.com/deadman360/crud_portifolio/src/configuration/rest_err"
 	"github.com/deadman360/crud_portifolio/src/controller/repository/entity/converter"
 	"github.com/deadman360/crud_portifolio/src/model"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 	"go.uber.org/zap"
 )
 
@@ -24,6 +26,12 @@ func (ur *userRepository) CreateUser(
 
 	collection_name := os.Getenv(MONGO_USER_DB_COLLECTION)
 	collection := ur.databaseConnection.Collection(collection_name)
+	//Verificação pra ver se existe o email na database
+	if err := collection.FindOne(context.Background(), bson.M{
+		"email": userDomain.GetEmail(),
+	}).Err(); err != mongo.ErrNoDocuments {
+		return nil, rest_err.NewBadRequestError("Email already in use")
+	}
 
 	userEntity := converter.ConvertDomainToEntity(userDomain)
 	result, err := collection.InsertOne(context.Background(), userEntity)
@@ -31,10 +39,8 @@ func (ur *userRepository) CreateUser(
 		return nil, rest_err.NewInternalServerError(err.Error(), nil)
 	}
 
-	id := result.InsertedID.(primitive.ObjectID).Hex()
+	userEntity.ID = result.InsertedID.(primitive.ObjectID)
 
-	userEntity.ID = id
-
-	logger.Info("User inserted in database id:"+id, journey)
+	logger.Info("User inserted in database id:"+result.InsertedID.(primitive.ObjectID).Hex(), journey)
 	return converter.ConvertEntityToDomain(*userEntity), nil
 }

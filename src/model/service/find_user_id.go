@@ -5,6 +5,6 @@ import (
 	"github.com/deadman360/crud_portifolio/src/model"
 )
 
-func (*userDomainService) FindUser(string) (*model.UserDomainInterface, *rest_err.RestErr) {
+func (*userDomainService) FindUserByID(email string) (*model.UserDomainInterface, *rest_err.RestErr) {
 	return nil, nil
 }
