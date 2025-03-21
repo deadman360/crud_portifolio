@@ -13,8 +13,7 @@ func (ud *userDomainService) FindUserByEmail(email string) (*model.UserDomainInt
 
 	userDomainInterfaceRepo, err := ud.userRepository.FindUserByEmail(email)
 	if err != nil {
-		restE := rest_err.NewInternalServerError("Error trying to call userRepository", err.Causes)
-		return nil, restE
+		return nil, err
 	}
 
 	return &userDomainInterfaceRepo, nil

@@ -14,9 +14,7 @@ import (
 	"go.uber.org/zap"
 )
 
-const (
-	MONGO_USER_DB_COLLECTION = "MONGO_USER_DB_COLLECTION"
-)
+
 
 func (ur *userRepository) CreateUser(
 	userDomain model.UserDomainInterface,
